@@ -6,7 +6,9 @@
 # python cache_simulator.py 128 2 4 R 1 bin_1000.bin
 #		exato: 1000 0.8640 0.1360 1.00 0.00 0.00
 # python cache_simulator.py 16 2 8 R 1 bin_10000.bin
-#		aproximadamente: 10000 0.9202 0.0798 0.16 0.84 0.00
+#		aproximadamente: 10000 0.9289 0.0711 0.18 0.82 0.00
+# python cache_simulator.py 512 8 2 R 1 vortex.in.sem.persons.bin
+#		aproximadamente: 186676 0.8780 0.1220 0.04 0.96 0.00
 
 import sys
 import math
@@ -78,8 +80,8 @@ def main():
 						miss_conflito += 1
 					
 					r = random.randint(0,assoc-1)
-					cache_bit_validade[r*nsets] = 1
-					cache_tag[r*nsets] = tag
+					cache_bit_validade[r*nsets+indice] = 1
+					cache_tag[r*nsets+indice] = tag
 
 			endereco = file.read(4)
    
