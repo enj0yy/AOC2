@@ -1,3 +1,13 @@
+# Graziele Fagundes e Rafael Freitas
+
+# Case tests: 
+# python cache_simulator.py 256 4 1 R 1 bin_100.bin
+#		exato: 100 0.9200 0.0800 1.00 0.00 0.00
+# python cache_simulator.py 128 2 4 R 1 bin_1000.bin
+#		exato: 1000 0.8640 0.1360 1.00 0.00 0.00
+# python cache_simulator.py 16 2 8 R 1 bin_10000.bin
+#		aproximadamente: 10000 0.9202 0.0798 0.16 0.84 0.00
+
 import sys
 import math
 import random
@@ -15,34 +25,31 @@ def main():
 	flagOut = int(sys.argv[5])		# flagOut = flag de formataçao de saída
 	arquivoEntrada = sys.argv[6]	# arquivoEntrada = arquivo de endereços
 
-
-	cache_bit_validade = [0] * (nsets * assoc)	# tamanho = n_sets * assoc
-	cache_tag = [0] * (nsets * assoc)			# tamanho = n_sets * assoc
+	cache_bit_validade = [0] * (nsets * assoc)	
+	cache_tag = [0] * (nsets * assoc)			
 
 	n_bits_indice = int(math.log2(nsets))
 	n_bits_offset = int(math.log2(bsize))
 	n_bits_tag = 32 - n_bits_offset - n_bits_indice
 
-	
-	miss_compulsorio = 0
-	hit = 0
 	acessos = 0
+	hit = 0
+	miss_compulsorio = 0
 	miss_capacidade = 0
 	miss_conflito = 0
  
-
-
 	with open(arquivoEntrada, 'rb') as file:
-		endereco_byte = file.read(4)
+		endereco = file.read(4)
 
-		while endereco_byte:
+		while endereco:
 			acessos += 1
 
-			endereco_int = int.from_bytes(endereco_byte, byteorder='big')
+			endereco_int = int.from_bytes(endereco, byteorder='big')
 
 			tag = endereco_int >> (n_bits_offset + n_bits_indice)
 			indice = (endereco_int >> n_bits_offset) & (2**(n_bits_indice) -1)
 
+			# Procurar por hit em todas vias
 			deu_hit = 0
 			i = indice
 			while (deu_hit != 1 and i < (nsets * assoc)):
@@ -51,20 +58,21 @@ def main():
 					deu_hit = 1
 				i += nsets
 
+			# Caso não ocorrer hit procurar onde colocar endereço
 			if (deu_hit == 0):
 				achou_posicao = 0
 				i = indice
-				while (i < (nsets * assoc)):
+				while (achou_posicao != 1 and i < (nsets * assoc)):
 					if (cache_bit_validade[i] == 0):
 						achou_posicao = 1
 						miss_compulsorio += 1
 						cache_bit_validade[i] = 1
 						cache_tag[i] = tag
-						break
 					i += nsets
 
+				# Caso não encontrar posição vazia calcular uma posição aleatória para substituir
 				if (achou_posicao == 0):
-					if(assoc>1):
+					if(assoc > 1):
 						miss_capacidade += 1
 					else:
 						miss_conflito += 1
@@ -73,18 +81,18 @@ def main():
 					cache_bit_validade[r*nsets] = 1
 					cache_tag[r*nsets] = tag
 
-			endereco_byte = file.read(4)
+			endereco = file.read(4)
    
 	total_misses = miss_capacidade + miss_conflito + miss_compulsorio
  
 	if(flagOut == 0):
 		print("---------------------------------------")
 		print("Acessos: {:.0f}".format(acessos))
-		print("Hits: {:.4f}".format(hit/acessos))
-		print("Total Misses: {:.4f}".format(total_misses/acessos))
-		print("Misses Compulsórios: {:.2f}".format(miss_compulsorio/total_misses))
-		print("Misses Capacidade: {:.2f}".format(miss_capacidade/total_misses))
-		print("Misses Conflito: {:.2f}".format(miss_conflito/total_misses))
+		print("Taxa de hit: {:.4f}".format(hit/acessos))
+		print("Taxa de miss: {:.4f}".format(total_misses/acessos))
+		print("Taxa de miss compulsório: {:.2f}".format(miss_compulsorio/total_misses))
+		print("Taxa de miss capacidade: {:.2f}".format(miss_capacidade/total_misses))
+		print("Taxa de miss conflito: {:.2f}".format(miss_conflito/total_misses))
 		print("---------------------------------------")
 
 	else:
