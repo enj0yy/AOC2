@@ -6,9 +6,11 @@
 # python cache_simulator.py 128 2 4 R 1 bin_1000.bin
 #		exato: 1000 0.8640 0.1360 1.00 0.00 0.00
 # python cache_simulator.py 16 2 8 R 1 bin_10000.bin
-#		aproximadamente: 10000 0.9289 0.0711 0.18 0.82 0.00
+#		aproximadamente: 10000 0.9306 0.0694 0.18 0.79 0.03
 # python cache_simulator.py 512 8 2 R 1 vortex.in.sem.persons.bin
-#		aproximadamente: 186676 0.8780 0.1220 0.04 0.96 0.00
+#		aproximadamente: 186676 0.8785 0.1215 0.05 0.93 0.02
+# python cache_simulator.py 1 4 32 R 1 vortex.in.sem.persons.bin
+#		aproximadamente: 186676 0.5447 0.4553 0.00 1.00 0.00
 
 import sys
 import math
@@ -62,6 +64,8 @@ def main():
 
 			# Caso não ocorrer hit procurar onde colocar endereço
 			if (deu_hit == 0):
+
+				# Procurar por uma posição vazia
 				achou_posicao = 0
 				i = indice
 				while (achou_posicao != 1 and i < (nsets * assoc)):
@@ -74,7 +78,7 @@ def main():
 
 				# Caso não encontrar posição vazia calcular uma posição aleatória para substituir
 				if (achou_posicao == 0):
-					if(assoc > 1):
+					if (cacheCheia(cache_bit_validade) == 1):
 						miss_capacidade += 1
 					else:
 						miss_conflito += 1
@@ -105,6 +109,12 @@ def main():
 		print("{:.2f}".format(miss_capacidade/total_misses), end=" ")
 		print("{:.2f}".format(miss_conflito/total_misses))
 
+def cacheCheia(cache_bit_validade):
+	for i in cache_bit_validade:
+		if i == 0:
+			return 0
+		
+	return 1
 
 if __name__ == '__main__':
 	main()
