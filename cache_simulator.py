@@ -31,6 +31,7 @@ def main():
 
 	cache_bit_validade = [0] * (nsets * assoc)	
 	cache_tag = [0] * (nsets * assoc)			
+	blocos_ocupados = 0
 
 	n_bits_indice = int(math.log2(nsets))
 	n_bits_offset = int(math.log2(bsize))
@@ -72,13 +73,14 @@ def main():
 					if (cache_bit_validade[i] == 0):
 						achou_posicao = 1
 						miss_compulsorio += 1
+						blocos_ocupados += 1
 						cache_bit_validade[i] = 1
 						cache_tag[i] = tag
 					i += nsets
 
 				# Caso não encontrar posição vazia calcular uma posição aleatória para substituir
 				if (achou_posicao == 0):
-					if (cacheCheia(cache_bit_validade) == 1):
+					if (cacheCheia(blocos_ocupados, nsets, assoc)):
 						miss_capacidade += 1
 					else:
 						miss_conflito += 1
@@ -109,12 +111,11 @@ def main():
 		print("{:.2f}".format(miss_capacidade/total_misses), end=" ")
 		print("{:.2f}".format(miss_conflito/total_misses))
 
-def cacheCheia(cache_bit_validade):
-	for i in cache_bit_validade:
-		if i == 0:
-			return 0
-		
-	return 1
-
+def cacheCheia(blocos_ocupados, nsets, assoc):
+	if blocos_ocupados < (nsets * assoc):
+		return 0
+	else:
+		return 1
+	
 if __name__ == '__main__':
 	main()
