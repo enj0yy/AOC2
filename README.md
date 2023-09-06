@@ -6,6 +6,7 @@ Execução: python cache_simulator.py nsets bsize assoc substituição flag_said
 Política de substituição suportada: R (random)
 
 Testes:
+
 python cache_simulator.py 256 4 1 R 1 bin_100.bin
         exato: 100 0.9200 0.0800 1.00 0.00 0.00
         
